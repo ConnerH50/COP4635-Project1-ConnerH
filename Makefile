@@ -1,13 +1,13 @@
 CXX = g++
-CXXFLAGS = -std=c++11 -g -Wall -pthread 
+CXXFLAGS = -std=c++11 -g -Wall -pthread #makefile for threads 
 
 
 OBJECTS = httpServer.o
 
-httpServer:  $(OBJECTS)
+server:  $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	$(RM) *.o main httpServer
+	$(RM) *.o main server
 
 
