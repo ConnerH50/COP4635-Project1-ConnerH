@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/sendfile.h>
+#include <netinet/in.h>
 
 /*
  * Namespaces
@@ -36,8 +38,10 @@ using namespace std;
 #define PORT 60069
 
 /*
- * Socket class maybe
+ * Other Methods
  */
+
+
 
 
 /*
@@ -45,6 +49,9 @@ using namespace std;
  */
 
 int main(int argc, char **argv){
+
+	int newSocket, serverFd, pid;
+	struct sockaddr_in address;
 
 	cout << "Port is: " << PORT << endl;
 
