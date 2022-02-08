@@ -8,6 +8,6 @@ httpServer:  $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	$(RM) *.o main httpServer
+	$(RM) *.o main httpServer server
 
 
