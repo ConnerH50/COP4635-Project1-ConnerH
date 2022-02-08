@@ -50,8 +50,19 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-	int newSocket, serverFd, pid;
-	struct sockaddr_in address;
+	int newSocket, serverFD, pid;
+	struct sockaddr_in sockAddress;
+	int addressLength = sizeof(sockAddress);
+
+	// set address variables
+	sockAddress.sin_family = AF_INET;
+	sockAddress.sin_addr.s_addr = INADDR_ANY; //set ip of address
+	sockAddress.sin_port = htons(PORT); //set port of address
+
+	if((serverFD = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+		cout << "Error cannot create socket" << endl;
+		return 0;
+	}	
 
 	cout << "Port is: " << PORT << endl;
 
