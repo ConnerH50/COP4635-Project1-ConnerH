@@ -97,10 +97,11 @@ int main(int argc, char **argv){
 	while(1){ // Infinite loop for the server
 		
 		//Accept testing
-		if((newSocket = accept(serverFD, (struct sockaddr *)&sockAddress, (socklen_t*)sizeof(sockAddress))) < 0){
+		if((newSocket = accept(serverFD, (struct sockaddr *)&sockAddress, (socklen_t*)&addressLength)) < 0){
 			cout << "Error in accept testing" << endl;
+			exit(EXIT_FAILURE);
 		}
-		
+
 	}	
 
 	cout << "Port is: " << PORT << endl;
