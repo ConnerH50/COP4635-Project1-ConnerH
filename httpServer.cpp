@@ -88,6 +88,19 @@ int main(int argc, char **argv){
 	if(listen(serverFD, 10) < 0){
 		cout << "error in listen" << endl;
 		exit(EXIT_FAILURE);
+	}
+
+	cout << "Port is: " << PORT << endl;
+	cout << "Hostname is: " << hostBuffer << endl;
+	cout << "Host IP is: " << IPBuffer << endl;
+
+	while(1){ // Infinite loop for the server
+		
+		//Accept testing
+		if((newSocket = accept(serverFD, (struct sockaddr *)&sockAddress, (socklen_t*)sizeof(sockAddress))) < 0){
+			cout << "Error in accept testing" << endl;
+		}
+		
 	}	
 
 	cout << "Port is: " << PORT << endl;
