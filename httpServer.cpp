@@ -41,7 +41,7 @@ using namespace std;
 #define PORT 60069
 
 /*
- * Other Methods
+ * Server Class
  */
 
 
@@ -53,8 +53,8 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-	int newSocket, serverFD, pid, hostName;
-	char hostBuffer[256];
+	int newSocket, serverFD, pid, hostName, valueRead;
+	char hostBuffer[1024];
 	char *IPBuffer;
 	struct hostent *hostEntry;
 	struct sockaddr_in sockAddress;
@@ -101,6 +101,26 @@ int main(int argc, char **argv){
 			cout << "Error in accept testing" << endl;
 			exit(EXIT_FAILURE);
 		}
+		
+		//fork process
+		pid = fork();
+		if(pid < 0){
+			cout << "Error in fork" << endl;
+			exit(EXIT_FAILURE);
+		}
+		
+		if(pid == 0){ //child 
+			//send to server
+			valueRead = read(newSocket , hostBuffer, 1024); 
+	    		printf("%s", hostBuffer ); 
+	    		send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0 ); 
+	    		printf("Hello message sent");
+	    		
+	    		close(newSocket);
+	    	}else{
+	    		cout << "parent create child with pid: " << pid << endl;
+	    		close(newSocket);
+	    	}
 
 	}	
 
