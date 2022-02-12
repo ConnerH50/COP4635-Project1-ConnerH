@@ -48,7 +48,7 @@ char http_header[25] = "HTTP/1.1 200 Ok\r\n";
  * Methods
  */
  
-char *parseRequestType(char firstRequest[], const char sym[]){
+/*char *parseRequestType(char firstRequest[], const char sym[]){
 	//char *copy = (char *)malloc(strlen(firstRequest) + 1);
     	//strcpy(copy, firstRequest);
         
@@ -75,22 +75,83 @@ char *parseRequestType(char firstRequest[], const char sym[]){
 }
  
 char *parseFileNeeded(char request[], const char sym[]){
-	//char *copyOfRequest = (char *)malloc(strlen(request) + 1);
-	char *fileNeeded;
-	char *token = strtok(request, sym);
-	int currentPlace = 0;
 	
-	while(token != NULL){
-		token = strtok(NULL, " ");
-		if(currentPlace == 0){
-			fileNeeded = token;
-			return fileNeeded;
-		}
-		currentPlace++;
-	}
-	
-	
-	return fileNeeded;
+	char *copy = (char *)malloc(strlen(request) + 1);
+    	strcpy(copy, request);
+    
+    	char *message;
+    	char * token = strtok(copy, sym);
+    	int current = 0;
+
+    	while( token != NULL ) {
+      
+      		token = strtok(NULL, " ");
+      		if(current == 0){
+          		message = token;
+          		if(message == NULL){
+              			message = "";
+          		}
+          	return message;
+      		}
+      		current = current + 1;
+   	}
+   free(token);
+   free(copy);
+   return message;
+}*/
+
+
+char* parse_method(char line[], const char symbol[])
+{
+
+
+	char *copy = (char *)malloc(strlen(line) + 1);
+    strcpy(copy, line);
+        
+    char *message;
+    char * token = strtok(copy, symbol);
+    int current = 0;
+
+    while( token != NULL ) {
+    	if(current == 0){
+        	message = token;
+          	if(message == NULL){
+              	message = "";
+          	}
+          	return message;
+      	}
+      	current = current + 1;
+   }
+   free(copy);
+   free(token);
+   return message;
+}
+
+char* parse(char line[], const char symbol[])
+{
+
+    char *copy = (char *)malloc(strlen(line) + 1);
+    strcpy(copy, line);
+    
+    char *message;
+    char * token = strtok(copy, symbol);
+    int current = 0;
+
+    while( token != NULL ) {
+      
+      token = strtok(NULL, " ");
+      if(current == 0){
+          message = token;
+          if(message == NULL){
+              message = "";
+          }
+          return message;
+      }
+      current = current + 1;
+   }
+   free(token);
+   free(copy);
+   return message;
 }
 
 
@@ -143,6 +204,9 @@ int main(int argc, char **argv){
 	cout << "Host IP is: " << IPBuffer << endl;
 
 	while(1){ // Infinite loop for the server
+	
+		printf("\n<<<<<<<<< Waiting for connection!! >>>>>>>>>\n\n");
+	
 		
 		//Accept testing
 		if((newSocket = accept(serverFD, (struct sockaddr *)&sockAddress, (socklen_t*)&addressLength)) < 0){
@@ -161,42 +225,32 @@ int main(int argc, char **argv){
 			//send to server
 			///*
 			valueRead = read(newSocket , buffer, 1024); 
-	    		cout << buffer << endl;
+	    	cout << buffer << endl;
+	    	
+	    	char *parse_string_method = parse_method(buffer, " ");  //Try to get the path which the client ask for
+            printf("Client method: %s\n", parse_string_method);
+
+
+            char *parse_string = parse(buffer, " ");  //Try to get the path which the client ask for
+            cout << "Path: " << parse_string << endl;
+
 	    		
-	    		//parse request type
+	    			/*//parse request type
 	    		char *parsedRequestType = parseRequestType(buffer, " ");  //Try to get the path which the client ask for
-            		cout << "Request type: " << parsedRequestType << endl;
+            	cout << "Request type: " << parsedRequestType << endl;
+            		
+            		//parse file needed
+            	char *parsedFileNeeded = parseFileNeeded(buffer, " ");  //Try to get the path which the client ask for
+            	cout << "File needed: " << parsedFileNeeded << endl;*/
+            		
 	    		
-	    		send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0); 
+	    	send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0); 
 	    		
-	    		close(newSocket);//*/
-	    		
-	    		/*valueRead = read(newSocket , buffer, 1024); // info from client
-			
-	    		//cout << buffer << endl; // prints what client wants?
-	    		char *requestType = parseRequestType(buffer, " ");
-	    		//cout << "Client request type is: " << requestType << endl;
+	    	close(newSocket);//*/
 	    		
 	    		
-	    		char *parsedRequest = parseSecond(buffer, " ");
-	    		//cout << "Parsed Request is: " << parsedRequest << endl;
-	    		
-	    		//copy parsedRequest to get any file types
-	    		char *copyOfParsedRequest;
-	    		strcpy(copyOfParsedRequest, parsedRequest);
-	    		
-	    		if(strcmp(requestType, "GET") == 0){
-	    			//cout << "requestType is GET" << endl;
-	    			
-	    		}
-	    		
-	    		send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0 ); 
-	    		printf("Hello message sent");
-	    		
-	    		close(newSocket);//*/
 	    		
 	    	}else{
-	    		//cout << "parent create child with pid: " << pid << endl;
 	    		close(newSocket);
 	    	}
 
