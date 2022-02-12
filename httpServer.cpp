@@ -24,6 +24,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/sendfile.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <netdb.h>
@@ -36,11 +38,11 @@
 using namespace std;
 
 /*
- * DEFINES and other stuff
+ * DEFINES and other declarations
  */
 
 #define PORT 60069
-char httpHeader[25] = "HTTP/1.1 200 Ok\r\n";
+char httpHeader[25] = "HTTP/1.1 200 Ok\r\n"; //needed for sending stuff
 
 
 
@@ -62,7 +64,7 @@ char* getRequestType(char request[], const char parseSym[]){
     requestType = token;
     int i = 0;
 
-    while(token != NULL) {
+    do{
     	if(i == 0){
         	requestType = token;
           	if(requestType == NULL){
@@ -71,7 +73,9 @@ char* getRequestType(char request[], const char parseSym[]){
           	return requestType;
       	}
       	i++;
-   }
+   }while(token != NULL);
+   
+   //free everything allocated
    free(token);
    free(copyOfRequest);
    return requestType;
@@ -90,7 +94,7 @@ char* getFileNeeded(char request[], const char parseSym[]){
     fileNeeded = token;
     int i = 0;
 
-    while(token != NULL) {
+    do{
       token = strtok(NULL, " ");
       if(i == 0){
           fileNeeded = token;
@@ -100,7 +104,9 @@ char* getFileNeeded(char request[], const char parseSym[]){
           return fileNeeded;
       }
       i++;
-   }
+   }while(token != NULL); 
+   
+   //free everything
    free(token);
    free(copyOfRequest);
    return fileNeeded;
@@ -113,7 +119,7 @@ char* getFileExtension(char request[], const char parseSym[]){
 	copyOfFileNeeded = (char *)malloc(strlen(request) + 1);
     strcpy(copyOfFileNeeded, request);
     
-    token = strtok(copyOfFileNeeded, parseSym); //parse by "."
+    token = strtok(copyOfFileNeeded, parseSym); //tokenize by "."
     fileExt = token;
     
     int i = 0;
@@ -126,36 +132,48 @@ char* getFileExtension(char request[], const char parseSym[]){
       	
     }*/
     
-
+	//free stuff
 	free(copyOfFileNeeded);
-	//cout << "In getFileExtension" << endl;
 	return fileExt;
+}
 
-	/*char *copyOfRequest, *token, *fileExtension;
+int sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
+	cout << "http path: " << httpPath << endl;
+	cout << "copy of header: " << copyOfHeader << endl;
+	
+	//	NEED TO DELETE WHEN I FIGURE OUT HOW IT WORKS
+	
+	struct stat inputFile;  /* hold information about input file */
 
-    copyOfRequest = (char *)malloc(strlen(request) + 1);
-    strcpy(copyOfRequest, request);
+    write(socket, copyOfHeader, strlen(copyOfHeader));
+
+    int serverFDTransfer = open(httpPath, O_RDONLY); //open for byte transfer
     
-    //tokenize the request copy
-    token = strtok(copyOfRequest, parseSym);
+    if(serverFDTransfer < 0){
+        perror("Cannot open file path!");
+    }
+     
+    fstat(serverFDTransfer, &inputFile);
+    int totalSize = inputFile.st_size;
+    int blockSize = inputFile.st_blksize;
     
-    fileExtension = token;
-    int i = 0;
+    
+    if(serverFDTransfer >= 0){
+        ssize_t sentSize;
 
-    while(token != NULL) {
-      token = strtok(NULL, " ");
-      if(i == 0){
-          fileExtension = token;
-          if(fileExtension == NULL){
-              strcpy(fileExtension, "");
-          }
-          return fileExtension;
-      }
-      i++;
-   }
-   free(token);
-   free(copyOfRequest);
-   return fileExtension;*/
+        while(totalSize > 0){
+    
+              int sendingBytes = ((totalSize < blockSize) ? totalSize : blockSize); // need to turn this into an if statement
+              int sentBytes = sendfile(socket, serverFDTransfer, NULL, blockSize);
+              totalSize -= sentBytes;
+        }
+        if(sentSize >= 0){
+            printf("send file: %s \n" , httpPath);
+        }
+        close(serverFDTransfer);
+    }
+	
+	return 0;
 }
 
 
@@ -244,9 +262,13 @@ int main(int argc, char **argv){
             strcpy(copyOfHeader, httpHeader);
 	    	
 	    	if(strcmp(requestType, "GET") == 0){
-	    		cout << "GET" << endl;
+	    		//cout << "GET" << endl;
 	    		if((strcmp(fileNeeded, "/") == 0) || (strcmp(fileNeeded, "") == 0)){
-	    			cout << "Need /index.html" << endl;
+	    			//cout << "Need /index.html" << endl;
+	    			char httpPath[1024] = ".";
+	    			strcat(httpPath, "/index.html");
+                    strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
+                    sendClientMessage(newSocket, httpPath, copyOfHeader);
 	    		}
 	    	
 	    	}
