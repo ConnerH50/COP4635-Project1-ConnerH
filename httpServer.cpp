@@ -122,8 +122,8 @@ char* parseRequestType(char request[], const char sym[]){
       	}
       	i++;
    }
-   free(copyOfRequest);
    free(token);
+   free(copyOfRequest);
    return requestType;
 }
 
@@ -131,16 +131,18 @@ char* parseFileNeeded(char request[], const char sym[]){
 
 	char *copyOfRequest, *token, *fileNeeded;
 
-    copyOfRequest = (char *)malloc(strlen(request) + 1);
-    strcpy(copyOfRequest, request);
+    //copyOfRequest = (char *)malloc(strlen(request) + 1);
+    //strcpy(copyOfRequest, request);
     
-    token = strtok(copyOfRequest, sym);
+    //tokenize the request copy
+    //token = strtok(copyOfRequest, sym);
+    
+    token = strtok(request, sym);
     
     fileNeeded = token;
     int i = 0;
 
     while(token != NULL) {
-      
       token = strtok(NULL, " ");
       if(i == 0){
           fileNeeded = token;
@@ -152,7 +154,7 @@ char* parseFileNeeded(char request[], const char sym[]){
       i++;
    }
    free(token);
-   free(fileNeeded);
+   //free(copyOfRequest);
    return fileNeeded;
 }
 
