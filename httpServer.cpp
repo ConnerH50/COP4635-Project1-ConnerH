@@ -49,7 +49,7 @@ char httpHeader[25] = "HTTP/1.1 200 Ok\r\n";
  */
  
 //Parse the request type
-char* parseRequestType(char request[], const char sym[]){
+char* getRequestType(char request[], const char parseSym[]){
 
 	char *copyOfRequest, *token, *requestType;
 
@@ -57,7 +57,7 @@ char* parseRequestType(char request[], const char sym[]){
     strcpy(copyOfRequest, request);
     
     //Tokenize the request copy
-    token = strtok(copyOfRequest, sym);
+    token = strtok(copyOfRequest, parseSym);
         
     requestType = token;
     int i = 0;
@@ -77,7 +77,7 @@ char* parseRequestType(char request[], const char sym[]){
    return requestType;
 }
 
-char* parseFileNeeded(char request[], const char sym[]){
+char* getFileNeeded(char request[], const char parseSym[]){
 
 	char *copyOfRequest, *token, *fileNeeded;
 
@@ -85,7 +85,7 @@ char* parseFileNeeded(char request[], const char sym[]){
     strcpy(copyOfRequest, request);
     
     //tokenize the request copy
-    token = strtok(copyOfRequest, sym);
+    token = strtok(copyOfRequest, parseSym);
     
     fileNeeded = token;
     int i = 0;
@@ -106,6 +106,58 @@ char* parseFileNeeded(char request[], const char sym[]){
    return fileNeeded;
 }
 
+char* getFileExtension(char request[], const char parseSym[]){
+
+	char *copyOfFileNeeded, *token, *fileExt;
+
+	copyOfFileNeeded = (char *)malloc(strlen(request) + 1);
+    strcpy(copyOfFileNeeded, request);
+    
+    token = strtok(copyOfFileNeeded, parseSym); //parse by "."
+    fileExt = token;
+    
+    int i = 0;
+    
+    /*while(token != NULL){
+    	token = strtok(NULL, " ");
+    	cout << "Token: " << token << endl;
+    	
+    	//token = strtok(NULL, " ");
+      	
+    }*/
+    
+
+	free(copyOfFileNeeded);
+	//cout << "In getFileExtension" << endl;
+	return fileExt;
+
+	/*char *copyOfRequest, *token, *fileExtension;
+
+    copyOfRequest = (char *)malloc(strlen(request) + 1);
+    strcpy(copyOfRequest, request);
+    
+    //tokenize the request copy
+    token = strtok(copyOfRequest, parseSym);
+    
+    fileExtension = token;
+    int i = 0;
+
+    while(token != NULL) {
+      token = strtok(NULL, " ");
+      if(i == 0){
+          fileExtension = token;
+          if(fileExtension == NULL){
+              strcpy(fileExtension, "");
+          }
+          return fileExtension;
+      }
+      i++;
+   }
+   free(token);
+   free(copyOfRequest);
+   return fileExtension;*/
+}
+
 
 /*
  * Main method
@@ -116,7 +168,7 @@ int main(int argc, char **argv){
 	int newSocket, serverFD, pid, hostName, valueRead;
 	char hostBuffer[1024];
 	char buffer[1024];
-	char *IPBuffer;
+	char *IPBuffer, *requestType, *fileNeeded, *copyOfFileNeeded, *fileExtension;
 	struct hostent *hostEntry;
 	struct sockaddr_in sockAddress;
 	int addressLength = sizeof(sockAddress);
@@ -178,17 +230,31 @@ int main(int argc, char **argv){
 			valueRead = read(newSocket , buffer, 1024); 
 	    	cout << buffer << endl;
 	    	
-	    	char *requestType = parseRequestType(buffer, " ");  //Try to get the request type
+	    	requestType = getRequestType(buffer, " ");  //get request type
             cout << "Request Type: "<< requestType << endl;
 
 
-            char *fileNeeded = parseFileNeeded(buffer, " ");  //Try to get the path which the client ask for
+            fileNeeded = getFileNeeded(buffer, " ");  //get needed file
             cout << "File Path: " << fileNeeded << endl;
+            
+            fileExtension = getFileExtension(fileNeeded, ".");
+            cout << "File Extension: " << fileExtension << endl;
 
-   			
-	    		
-	    	send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0); 
-	    		
+   			char *copyOfHeader = (char *)malloc(strlen(httpHeader) +200);
+            strcpy(copyOfHeader, httpHeader);
+	    	
+	    	if(strcmp(requestType, "GET") == 0){
+	    		cout << "GET" << endl;
+	    		if((strcmp(fileNeeded, "/") == 0) || (strcmp(fileNeeded, "") == 0)){
+	    			cout << "Need /index.html" << endl;
+	    		}
+	    	
+	    	}
+	    	
+	    	send(newSocket , "Welcome to server!", strlen("Welcome to Server!") , 0); 
+	    	
+	    	free(copyOfHeader);
+	    	cout << "closing socket" << endl;	
 	    	close(newSocket);
 	    		
 	    		
