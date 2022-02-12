@@ -101,57 +101,59 @@ char *parseFileNeeded(char request[], const char sym[]){
 }*/
 
 
-char* parseRequestType(char line[], const char symbol[])
-{
+char* parseRequestType(char request[], const char sym[]){
 
+	char *copyOfRequest, *token, *requestType;
 
-	char *copy = (char *)malloc(strlen(line) + 1);
-    strcpy(copy, line);
+	copyOfRequest = (char *)malloc(strlen(request) + 1);
+    strcpy(copyOfRequest, request);
+    token = strtok(copyOfRequest, sym);
         
-    char *message;
-    char * token = strtok(copy, symbol);
-    int current = 0;
+    requestType = token;
+    int i = 0;
 
-    while( token != NULL ) {
-    	if(current == 0){
-        	message = token;
-          	if(message == NULL){
-              	message = "";
+    while(token != NULL) {
+    	if(i == 0){
+        	requestType = token;
+          	if(requestType == NULL){
+              	strcpy(requestType, "");
           	}
-          	return message;
+          	return requestType;
       	}
-      	current = current + 1;
+      	i++;
    }
-   free(copy);
+   free(copyOfRequest);
    free(token);
-   return message;
+   return requestType;
 }
 
-char* parseFileNeeded(char line[], const char symbol[])
-{
+char* parseFileNeeded(char request[], const char sym[]){
 
-    char *copy = (char *)malloc(strlen(line) + 1);
-    strcpy(copy, line);
+	char *copyOfRequest, *token, *fileNeeded;
+
+    copyOfRequest = (char *)malloc(strlen(request) + 1);
+    strcpy(copyOfRequest, request);
     
-    char *message;
-    char * token = strtok(copy, symbol);
-    int current = 0;
+    token = strtok(copyOfRequest, sym);
+    
+    fileNeeded = token;
+    int i = 0;
 
-    while( token != NULL ) {
+    while(token != NULL) {
       
       token = strtok(NULL, " ");
-      if(current == 0){
-          message = token;
-          if(message == NULL){
-              message = "";
+      if(i == 0){
+          fileNeeded = token;
+          if(fileNeeded == NULL){
+              strcpy(fileNeeded, "");
           }
-          return message;
+          return fileNeeded;
       }
-      current = current + 1;
+      i++;
    }
    free(token);
-   free(copy);
-   return message;
+   free(fileNeeded);
+   return fileNeeded;
 }
 
 
