@@ -283,8 +283,12 @@ int main(int argc, char **argv){
 	    			strcat(httpPath, fileNeeded);
 	    			strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
                     sendClientMessage(newSocket, httpPath, copyOfHeader);
-	    		}else if(strcmp(fileExtension, "jpg") == 0){
-	    		
+	    		}else if((strcmp(fileExtension, "jpg") == 0) || (strcmp(fileExtension, "jpeg") == 0)){
+	    			// need to add send pictures stuff
+	    			char httpPath[1024] = ".";
+	    			strcat(httpPath, fileNeeded);
+	    			strcat(copyOfHeader, "Content-Type: image/jpeg\r\n\r\n");
+	    			sendClientMessage(newSocket, httpPath, copyOfHeader);
 	    		}
 	    	
 	    	}
