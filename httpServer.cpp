@@ -122,7 +122,7 @@ char* getFileExtension(char request[], const char parseSym[])
 	char *copyOfRequest, *token, *fileExt;
 	int currentPlace = 0;
 
-    cout << "<<<<<< IN GETFILEEXTENSION <<<<<<<<<<<" << endl;
+    //cout << "<<<<<< IN GETFILEEXTENSION <<<<<<<<<<<" << endl;
 
     copyOfRequest = (char *)malloc(strlen(request) + 1);
     strcpy(copyOfRequest, request);
@@ -160,6 +160,8 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
     
     if(serverFDTransfer < 0){
         perror("Cannot open file path!");
+        send(socket , "404 Not Found!", strlen("404 Not Found!") , 0);
+        //add 404 error stuff
     }
      
     fstat(serverFDTransfer, &inputFile); // initialize inputFile
@@ -170,7 +172,7 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
     
     
     if(serverFDTransfer >= 0){
-        ssize_t sentSize;
+        //ssize_t sentSize;
 
         while(totalSize > 0){ 
     
@@ -178,11 +180,11 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
               int sentBytes = sendfile(socket, serverFDTransfer, NULL, blockSize);
               totalSize -= sentBytes;
               
-              cout << "Signed size_t: " << sentSize << endl;
+              //cout << "Signed size_t: " << sentSize << endl;
         }
-        if(sentSize >= 0){
+        /*if(sentSize >= 0){
             printf("send file: %s \n" , httpPath);
-        }
+        }*/
         close(serverFDTransfer); //close byte transfer
     }
 	
@@ -280,11 +282,12 @@ int main(int argc, char **argv){
                     strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
                     sendClientMessage(newSocket, httpPath, copyOfHeader);
 	    		}else if(strcmp(fileExtension, "html") == 0){
-	    			cout << "Needs a .html file" << endl;
 	    			char httpPath[1024] = ".";
 	    			strcat(httpPath, fileNeeded);
 	    			strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
                     sendClientMessage(newSocket, httpPath, copyOfHeader);
+	    		}else if(strcmp(fileExtension, "jpg") == 0){
+	    		
 	    		}
 	    	
 	    	}
