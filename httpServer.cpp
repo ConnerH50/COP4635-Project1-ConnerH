@@ -50,8 +50,7 @@ char httpHeader[25] = "HTTP/1.1 200 Ok\r\n"; //needed for sending stuff
 /*
  * Methods
  */
- 
-//Parse the request type
+
 char* getRequestType(char request[], const char parseSym[]){
 
 	char *copyOfRequest, *token, *requestType;
@@ -128,8 +127,8 @@ char* getFileExtension(char request[], const char parseSym[])
     copyOfRequest = (char *)malloc(strlen(request) + 1);
     strcpy(copyOfRequest, request);
     
-    //fileExt;
     token = strtok(copyOfRequest, parseSym);
+    fileExt = token;
 
     do{
       token = strtok(NULL, " ");
@@ -171,7 +170,7 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
     
     
     if(serverFDTransfer >= 0){
-        ssize_t sentSize = strlen(httpPath);
+        ssize_t sentSize;
 
         while(totalSize > 0){ 
     
@@ -265,7 +264,6 @@ int main(int argc, char **argv){
 	    	requestType = getRequestType(buffer, " ");  //get request type
             cout << "Request Type: "<< requestType << endl;
 
-
             fileNeeded = getFileNeeded(buffer, " ");  //get needed file
             cout << "File Path: " << fileNeeded << endl;
             
@@ -276,20 +274,22 @@ int main(int argc, char **argv){
             strcpy(copyOfHeader, httpHeader);
 	    	
 	    	if(strcmp(requestType, "GET") == 0){
-	    		//cout << "GET" << endl;
 	    		if((strcmp(fileNeeded, "/") == 0) || (strcmp(fileNeeded, "") == 0)){
-	    			//cout << "Need /index.html" << endl;
 	    			char httpPath[1024] = ".";
 	    			strcat(httpPath, "/index.html");
                     strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
                     sendClientMessage(newSocket, httpPath, copyOfHeader);
-	    		}else if(strcmp(fileExtension, ".html") == 0){
-	    		
+	    		}else if(strcmp(fileExtension, "html") == 0){
+	    			cout << "Needs a .html file" << endl;
+	    			char httpPath[1024] = ".";
+	    			strcat(httpPath, fileNeeded);
+	    			strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
+                    sendClientMessage(newSocket, httpPath, copyOfHeader);
 	    		}
 	    	
 	    	}
 	    	
-	    	send(newSocket , "Welcome to server!", strlen("Welcome to Server!") , 0); 
+	    	//send(newSocket , "Welcome to server!", strlen("Welcome to Server!") , 0); 
 	    	
 	    	free(copyOfHeader);
 	    	cout << "closing socket" << endl;	
