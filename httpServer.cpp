@@ -101,7 +101,7 @@ char *parseFileNeeded(char request[], const char sym[]){
 }*/
 
 
-char* parse_method(char line[], const char symbol[])
+char* parseRequestType(char line[], const char symbol[])
 {
 
 
@@ -127,7 +127,7 @@ char* parse_method(char line[], const char symbol[])
    return message;
 }
 
-char* parse(char line[], const char symbol[])
+char* parseFileNeeded(char line[], const char symbol[])
 {
 
     char *copy = (char *)malloc(strlen(line) + 1);
@@ -223,16 +223,15 @@ int main(int argc, char **argv){
 		
 		if(pid == 0){ //child 
 			//send to server
-			///*
 			valueRead = read(newSocket , buffer, 1024); 
 	    	cout << buffer << endl;
 	    	
-	    	char *parse_string_method = parse_method(buffer, " ");  //Try to get the path which the client ask for
-            printf("Client method: %s\n", parse_string_method);
+	    	char *requestType = parseRequestType(buffer, " ");  //Try to get the request type
+            cout << "Request Type: "<< requestType << endl;
 
 
-            char *parse_string = parse(buffer, " ");  //Try to get the path which the client ask for
-            cout << "Path: " << parse_string << endl;
+            char *fileNeeded = parseFileNeeded(buffer, " ");  //Try to get the path which the client ask for
+            cout << "File Path: " << fileNeeded << endl;
 
 	    		
 	    			/*//parse request type
@@ -246,7 +245,7 @@ int main(int argc, char **argv){
 	    		
 	    	send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0); 
 	    		
-	    	close(newSocket);//*/
+	    	close(newSocket);
 	    		
 	    		
 	    		
