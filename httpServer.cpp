@@ -40,7 +40,7 @@ using namespace std;
  */
 
 #define PORT 60069
-char http_header[25] = "HTTP/1.1 200 Ok\r\n";
+char httpHeader[25] = "HTTP/1.1 200 Ok\r\n";
 
 
 
@@ -48,65 +48,15 @@ char http_header[25] = "HTTP/1.1 200 Ok\r\n";
  * Methods
  */
  
-/*char *parseRequestType(char firstRequest[], const char sym[]){
-	//char *copy = (char *)malloc(strlen(firstRequest) + 1);
-    	//strcpy(copy, firstRequest);
-        
-    	char *requestType;
-    	char *token = strtok(firstRequest, sym);
-	int current = 0;
-
-    	while( token != NULL ) {
-    	
-      		if(current == 0){
-        		requestType = token;
-          		if(requestType == NULL){
-              			strcpy(requestType, "");
-          		}
-          		//free(copy);
-          		return requestType;
-      		}
-      		current = current + 1;
-   	}
-   	//free(copy);
-   	free(token);
-   	return requestType; 
- 
-}
- 
-char *parseFileNeeded(char request[], const char sym[]){
-	
-	char *copy = (char *)malloc(strlen(request) + 1);
-    	strcpy(copy, request);
-    
-    	char *message;
-    	char * token = strtok(copy, sym);
-    	int current = 0;
-
-    	while( token != NULL ) {
-      
-      		token = strtok(NULL, " ");
-      		if(current == 0){
-          		message = token;
-          		if(message == NULL){
-              			message = "";
-          		}
-          	return message;
-      		}
-      		current = current + 1;
-   	}
-   free(token);
-   free(copy);
-   return message;
-}*/
-
-
+//Parse the request type
 char* parseRequestType(char request[], const char sym[]){
 
 	char *copyOfRequest, *token, *requestType;
 
 	copyOfRequest = (char *)malloc(strlen(request) + 1);
     strcpy(copyOfRequest, request);
+    
+    //Tokenize the request copy
     token = strtok(copyOfRequest, sym);
         
     requestType = token;
@@ -131,13 +81,11 @@ char* parseFileNeeded(char request[], const char sym[]){
 
 	char *copyOfRequest, *token, *fileNeeded;
 
-    //copyOfRequest = (char *)malloc(strlen(request) + 1);
-    //strcpy(copyOfRequest, request);
+    copyOfRequest = (char *)malloc(strlen(request) + 1);
+    strcpy(copyOfRequest, request);
     
     //tokenize the request copy
-    //token = strtok(copyOfRequest, sym);
-    
-    token = strtok(request, sym);
+    token = strtok(copyOfRequest, sym);
     
     fileNeeded = token;
     int i = 0;
@@ -154,7 +102,7 @@ char* parseFileNeeded(char request[], const char sym[]){
       i++;
    }
    free(token);
-   //free(copyOfRequest);
+   free(copyOfRequest);
    return fileNeeded;
 }
 
@@ -237,15 +185,7 @@ int main(int argc, char **argv){
             char *fileNeeded = parseFileNeeded(buffer, " ");  //Try to get the path which the client ask for
             cout << "File Path: " << fileNeeded << endl;
 
-	    		
-	    			/*//parse request type
-	    		char *parsedRequestType = parseRequestType(buffer, " ");  //Try to get the path which the client ask for
-            	cout << "Request type: " << parsedRequestType << endl;
-            		
-            		//parse file needed
-            	char *parsedFileNeeded = parseFileNeeded(buffer, " ");  //Try to get the path which the client ask for
-            	cout << "File needed: " << parsedFileNeeded << endl;*/
-            		
+   			
 	    		
 	    	send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0); 
 	    		
@@ -263,5 +203,6 @@ int main(int argc, char **argv){
 	cout << "Hostname is: " << hostBuffer << endl;
 	cout << "Host IP is: " << IPBuffer << endl;
 
+	close(serverFD);
 	return 0;
 }
