@@ -115,78 +115,36 @@ char* getFileNeeded(char request[], const char parseSym[]){
    return fileNeeded;
 }
 
-/*char* getFileExtension(char request[], const char parseSym[]){
 
-	char *copyOfFileNeeded, *token, *fileExt;
-	//char sym = (char)parseSym;
-	
-	string extString = request;
-	string temp;
-	
-	vector<char *> tokenVector;
-	vector <string> tokens;
-	
-	stringstream ss(extString); 
-	
-	
-	while(getline(ss, temp, '.')){
-		tokens.push_back(temp);
-	}
-	
-	strcpy(fileExt, tokens.back().c_str());
-
-	//copyOfFileNeeded = (char *)malloc(strlen(request) + 1);
-    //strcpy(copyOfFileNeeded, request);
-    
-    token = strtok(request, parseSym); //tokenize by "."
-    tokenVector.push_back(token);
-    fileExt = token;
-    strcpy(fileExt, token);
-    cout << "Token: " << token << endl;
-    //cout << "File Extension: " << fileExt << endl;
-    
-    int i = 0;
-    
-    while(token != NULL){
-    	token = strtok(NULL, " ");
-    	cout << "Token: " << token << endl;
-    	
-    	//token = strtok(NULL, " ");
-      	strcpy(fileExt, token);
-    }
-    
-	//free stuff
-	//free(copyOfFileNeeded);
-	return fileExt;
-}*/
-
-char* getFileExtension(char line[], const char symbol[])
+char* getFileExtension(char request[], const char parseSym[])
 {
+	
+	char *copyOfRequest, *token, *fileExt;
 
-    cout << "<<<<<< IN PARSE <<<<<<<<<<<" << endl;
+    cout << "<<<<<< IN GETFILEEXTENSION <<<<<<<<<<<" << endl;
 
-    char *copy = (char *)malloc(strlen(line) + 1);
-    strcpy(copy, line);
+    copyOfRequest = (char *)malloc(strlen(request) + 1);
+    strcpy(copyOfRequest, request);
     
-    char *message;
-    char * token = strtok(copy, symbol);
+    //fileExt;
+    token = strtok(copyOfRequest, parseSym);
     int current = 0;
 
     while( token != NULL ) {
       
       token = strtok(NULL, " ");
       if(current == 0){
-          message = token;
-          if(message == NULL){
-              message = "";
+          fileExt = token;
+          if(fileExt == NULL){
+              fileExt = "";
           }
-          return message;
+          return fileExt;
       }
       current = current + 1;
    }
    free(token);
-   free(copy);
-   return message;
+   free(copyOfRequest);
+   return fileExt;
 }
 
 void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
