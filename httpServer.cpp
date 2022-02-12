@@ -49,11 +49,11 @@ char http_header[25] = "HTTP/1.1 200 Ok\r\n";
  */
  
 char *parseRequestType(char firstRequest[], const char sym[]){
-	char *copy = (char *)malloc(strlen(firstRequest) + 1);
-    	strcpy(copy, firstRequest);
+	//char *copy = (char *)malloc(strlen(firstRequest) + 1);
+    	//strcpy(copy, firstRequest);
         
     	char *requestType;
-    	char *token = strtok(copy, sym);
+    	char *token = strtok(firstRequest, sym);
 	int current = 0;
 
     	while( token != NULL ) {
@@ -63,35 +63,34 @@ char *parseRequestType(char firstRequest[], const char sym[]){
           		if(requestType == NULL){
               			strcpy(requestType, "");
           		}
-          		free(copy);
+          		//free(copy);
           		return requestType;
       		}
       		current = current + 1;
    	}
-   	free(copy);
+   	//free(copy);
    	free(token);
    	return requestType; 
  
 }
  
-char *parseSecond(char request[], const char sym[]){
+char *parseFileNeeded(char request[], const char sym[]){
 	//char *copyOfRequest = (char *)malloc(strlen(request) + 1);
-	char *parsedRequest;
+	char *fileNeeded;
 	char *token = strtok(request, sym);
 	int currentPlace = 0;
 	
 	while(token != NULL){
 		token = strtok(NULL, " ");
 		if(currentPlace == 0){
-			parsedRequest = token;
-			return parsedRequest;
+			fileNeeded = token;
+			return fileNeeded;
 		}
 		currentPlace++;
 	}
 	
 	
-	//free(copyOfRequest);
-	return parsedRequest;
+	return fileNeeded;
 }
 
 
@@ -164,7 +163,9 @@ int main(int argc, char **argv){
 			valueRead = read(newSocket , buffer, 1024); 
 	    		cout << buffer << endl;
 	    		
-	    		
+	    		//parse request type
+	    		char *parsedRequestType = parseRequestType(buffer, " ");  //Try to get the path which the client ask for
+            		cout << "Request type: " << parsedRequestType << endl;
 	    		
 	    		send(newSocket , "Welcome to server!" , strlen("Welcome to Server!") , 0); 
 	    		
