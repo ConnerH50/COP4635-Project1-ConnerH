@@ -70,6 +70,7 @@ char* getRequestType(char request[], const char parseSym[]){
         	requestType = token;
           	if(requestType == NULL){
               	strcpy(requestType, "");
+              	//requestType = (char *)'\0';
           	}
           	return requestType;
       	}
@@ -93,7 +94,6 @@ char* getFileNeeded(char request[], const char parseSym[]){
     token = strtok(copyOfRequest, parseSym);
     
     fileNeeded = token;
-    //strcpy(fileNeeded, token);
     int i = 0;
 
     do{
@@ -103,6 +103,7 @@ char* getFileNeeded(char request[], const char parseSym[]){
           strcpy(fileNeeded, token);
           if(fileNeeded == NULL){
               strcpy(fileNeeded, "");
+              //fileNeeded = (char *)'\0';
           }
           return fileNeeded;
       }
@@ -120,6 +121,7 @@ char* getFileExtension(char request[], const char parseSym[])
 {
 	
 	char *copyOfRequest, *token, *fileExt;
+	int currentPlace = 0;
 
     cout << "<<<<<< IN GETFILEEXTENSION <<<<<<<<<<<" << endl;
 
@@ -128,20 +130,20 @@ char* getFileExtension(char request[], const char parseSym[])
     
     //fileExt;
     token = strtok(copyOfRequest, parseSym);
-    int current = 0;
 
-    while( token != NULL ) {
-      
+    do{
       token = strtok(NULL, " ");
-      if(current == 0){
+      if(currentPlace == 0){
           fileExt = token;
           if(fileExt == NULL){
-              fileExt = "";
+              fileExt = (char *)'\0';
           }
           return fileExt;
       }
-      current = current + 1;
-   }
+      currentPlace++;
+   }while(token != NULL);
+   
+   //free everything...again
    free(token);
    free(copyOfRequest);
    return fileExt;
