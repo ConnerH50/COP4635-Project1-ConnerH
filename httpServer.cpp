@@ -160,8 +160,7 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
     
     if(serverFDTransfer < 0){
         perror("Cannot open file path!");
-        send(socket , "404 Not Found!", strlen("404 Not Found!") , 0);
-        //add 404 error stuff
+        send(socket , "404 Not Found!", strlen("404 Not Found!") , 0); //404 error stuff
     }
      
     fstat(serverFDTransfer, &inputFile); // initialize inputFile
@@ -187,8 +186,6 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
         }*/
         close(serverFDTransfer); //close byte transfer
     }
-	
-	//return 0;
 }
 
 
