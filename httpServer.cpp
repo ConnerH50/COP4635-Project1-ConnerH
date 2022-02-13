@@ -51,7 +51,7 @@ char httpHeader[25] = "HTTP/1.1 200 Ok\r\n"; //needed for sending stuff
  * Methods
  */
 
-char* getRequestType(char request[], const char parseSym[]){
+/*char* getRequestType(char request[], const char parseSym[]){
 
 	char *copyOfRequest, *token, *requestType;
 
@@ -141,14 +141,14 @@ char* getFileExtension(char request[], const char parseSym[])
    free(token);
    free(copyOfRequest);
    return fileExt;
-}
+}**/
 
 vector<char *> getRequestInfo(char request[]){
 	vector<char *> requestInfo;
 	char *requestType, *filePath, *fileExt, *token;
 	char *string = strtok(request, "\n");
 	
-	cout << "First line of the request: " << string << endl;
+	//cout << "First line of the request: " << string << endl;
 	
 	// tokenize by " ", " ", and "."
 	
@@ -160,21 +160,21 @@ vector<char *> getRequestInfo(char request[]){
 	
 	//get filePath
 	token = strtok(NULL, " ");
-	cout << "	the token is: " << token << endl;
+	//cout << "	the token is: " << token << endl;
 	filePath = token;
 	requestInfo.push_back(token);
 	
 	
 	// get fileExt
 	token = strtok(filePath, ".");
-	cout << "			token is: " << token << endl;
+	//cout << "			token is: " << token << endl;
 	token = strtok(NULL, ".");
 	fileExt = token;
 	requestInfo.push_back(fileExt);
 	
-	cout << "Request type is: " << requestInfo[0] << endl;
+	/*cout << "Request type is: " << requestInfo[0] << endl;
 	cout << "File Path is: " << requestInfo[1] << endl;
-	cout << "FileExt is: " << requestInfo[2] << endl;
+	cout << "FileExt is: " << requestInfo[2] << endl;*/
 	
 	return requestInfo;
 
@@ -182,7 +182,7 @@ vector<char *> getRequestInfo(char request[]){
 
 void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
 	cout << "http path: " << httpPath << endl;
-	cout << "copy of header: " << copyOfHeader << endl;
+	//cout << "copy of header: " << copyOfHeader << endl;
 	
 	struct stat inputFile;  // hold information about input file 
 
@@ -213,6 +213,32 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
     }
 }
 
+void sendDefaultPage(char *header, int socket){
+	char httpPath[1024] = ".";
+	strcat(httpPath, "/index.html");
+    strcat(header, "Content-Type: text/html\r\n\r\n");
+    sendClientMessage(socket, httpPath, header);
+
+}
+
+void sendHTML(char *header, int socket, char *filePath, char* fileExtension){
+	char httpPath[1024] = ".";
+	strcat(httpPath, filePath);
+	strcat(httpPath, ".");
+	strcat(httpPath, fileExtension);
+	strcat(header, "Content-Type: text/html\r\n\r\n");
+    sendClientMessage(socket, httpPath, header);
+} 
+
+void sendJPEG(char *header, int socket, char *filePath, char* fileExtension){
+	char httpPath[1024] = ".";
+	strcat(httpPath, filePath);
+	strcat(httpPath, ".");
+	strcat(httpPath, fileExtension);
+	strcat(header, "Content-Type: image/jpeg\r\n\r\n");
+	sendClientMessage(socket, httpPath, header);
+}
+
 
 /*
  * Main method
@@ -224,7 +250,7 @@ int main(int argc, char **argv){
 	vector<char *> requestData;
 	char hostBuffer[1024];
 	char buffer[1024];
-	char *IPBuffer, *requestType, *fileNeeded, *fileExtension;
+	char *IPBuffer, *requestType, *filePath, *fileExtension;
 	struct hostent *hostEntry;
 	struct sockaddr_in sockAddress;
 	int addressLength = sizeof(sockAddress);
@@ -265,7 +291,7 @@ int main(int argc, char **argv){
 
 	while(1){ // Infinite loop for the server
 	
-		printf("\n<<<<<<<<< Waiting for connection!! >>>>>>>>>\n\n");
+		cout << endl << "---------------------------------------------" << endl << endl;
 	
 		
 		//Accept testing
@@ -288,21 +314,13 @@ int main(int argc, char **argv){
 	    	
 	    	requestData = getRequestInfo(buffer); // parse request into vector
 	    	
-	    	//		parse all request data
-	    	/*requestType = getRequestType(buffer, " ");  //get request type
-            cout << "Request Type: "<< requestType << endl;
-
-            fileNeeded = getFileNeeded(buffer, " ");  //get needed file
-            cout << "File Path: " << fileNeeded << endl;
-            
-            fileExtension = getFileExtension(fileNeeded, "."); //get file extension
-            cout << "File Extension: " << fileExtension << endl;*/
+	    	//parse all request data
             
             requestType = requestData[0];  //get request type
             cout << "Request Type: "<< requestType << endl;
 
-            fileNeeded = requestData[1];  //get needed file
-            cout << "File Path: " << fileNeeded << endl;
+            filePath = requestData[1];  //get needed file
+            cout << "File Path: " << filePath << endl;
             
             fileExtension = requestData[2]; //get file extension
             cout << "File Extension: " << fileExtension << endl;
@@ -312,25 +330,31 @@ int main(int argc, char **argv){
             strcpy(copyOfHeader, httpHeader);
 	    	
 	    	if(strcmp(requestType, "GET") == 0){
-	    		if((strcmp(fileNeeded, "/") == 0) || (strcmp(fileNeeded, "") == 0)){
-	    			char httpPath[1024] = ".";
+	    		if((strcmp(filePath, "/") == 0) || (strcmp(filePath, "") == 0)){
+	    			/*char httpPath[1024] = ".";
 	    			strcat(httpPath, "/index.html");
                     strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
-                    sendClientMessage(newSocket, httpPath, copyOfHeader);
+                    sendClientMessage(newSocket, httpPath, copyOfHeader);*/
+                    
+                    sendDefaultPage(copyOfHeader, newSocket);
 	    		}else if(strcmp(fileExtension, "html") == 0){
-	    			char httpPath[1024] = ".";
-	    			strcat(httpPath, fileNeeded);
+	    			/*char httpPath[1024] = ".";
+	    			strcat(httpPath, filePath);
 	    			strcat(httpPath, ".");
 	    			strcat(httpPath, fileExtension);
 	    			strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
-                    sendClientMessage(newSocket, httpPath, copyOfHeader);
+                    sendClientMessage(newSocket, httpPath, copyOfHeader);*/
+                    
+                    sendHTML(copyOfHeader, newSocket, filePath, fileExtension);
 	    		}else if((strcmp(fileExtension, "jpg") == 0) || (strcmp(fileExtension, "jpeg") == 0)){
-	    			char httpPath[1024] = ".";
-	    			strcat(httpPath, fileNeeded);
+	    			/*char httpPath[1024] = ".";
+	    			strcat(httpPath, filePath);
 	    			strcat(httpPath, ".");
 	    			strcat(httpPath, fileExtension);
 	    			strcat(copyOfHeader, "Content-Type: image/jpeg\r\n\r\n");
-	    			sendClientMessage(newSocket, httpPath, copyOfHeader);
+	    			sendClientMessage(newSocket, httpPath, copyOfHeader);*/
+	    			
+	    			sendJPEG(copyOfHeader, newSocket, filePath, fileExtension);
 	    		}
 	    	
 	    	}
