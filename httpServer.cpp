@@ -69,7 +69,6 @@ char* getRequestType(char request[], const char parseSym[]){
         	requestType = token;
           	if(requestType == NULL){
               	strcpy(requestType, "");
-              	//requestType = (char *)'\0';
           	}
           	return requestType;
       	}
@@ -98,11 +97,9 @@ char* getFileNeeded(char request[], const char parseSym[]){
     do{
       token = strtok(NULL, " ");
       if(i == 0){
-          //fileNeeded = token;
           strcpy(fileNeeded, token);
           if(fileNeeded == NULL){
               strcpy(fileNeeded, "");
-              //fileNeeded = (char *)'\0';
           }
           return fileNeeded;
       }
@@ -121,8 +118,6 @@ char* getFileExtension(char request[], const char parseSym[])
 	
 	char *copyOfRequest, *token, *fileExt;
 	int currentPlace = 0;
-
-    //cout << "<<<<<< IN GETFILEEXTENSION <<<<<<<<<<<" << endl;
 
     copyOfRequest = (char *)malloc(strlen(request) + 1);
     strcpy(copyOfRequest, request);
@@ -156,7 +151,7 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
 
     write(socket, copyOfHeader, strlen(copyOfHeader));
 
-    int serverFDTransfer = open(httpPath, O_RDONLY); //open for byte transfer
+    int serverFDTransfer = open(httpPath, O_RDONLY); //open for byte transfer, read only
     
     if(serverFDTransfer < 0){
         perror("Cannot open file path!");
@@ -171,19 +166,12 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
     
     
     if(serverFDTransfer >= 0){
-        //ssize_t sentSize;
 
         while(totalSize > 0){ 
-    
-              //int sendingBytes = ((totalSize < blockSize) ? totalSize : blockSize); // need to turn this into an if statement, may not actually need...
               int sentBytes = sendfile(socket, serverFDTransfer, NULL, blockSize);
               totalSize -= sentBytes;
-              
-              //cout << "Signed size_t: " << sentSize << endl;
+             
         }
-        /*if(sentSize >= 0){
-            printf("send file: %s \n" , httpPath);
-        }*/
         close(serverFDTransfer); //close byte transfer
     }
 }
@@ -255,9 +243,9 @@ int main(int argc, char **argv){
 			exit(EXIT_FAILURE);
 		}
 		
-		if(pid == 0){ //child 
-			//send to server
-			valueRead = read(newSocket , buffer, 1024); 
+		if(pid == 0){ 
+			//valueRead = read(newSocket , buffer, 1024); 
+			read(newSocket , buffer, 1024); 
 	    	cout << buffer << endl;
 	    	
 	    	requestType = getRequestType(buffer, " ");  //get request type
@@ -292,8 +280,6 @@ int main(int argc, char **argv){
 	    		}
 	    	
 	    	}
-	    	
-	    	//send(newSocket , "Welcome to server!", strlen("Welcome to Server!") , 0); 
 	    	
 	    	free(copyOfHeader);
 	    	cout << "closing socket" << endl;	
