@@ -51,104 +51,10 @@ char httpHeader[25] = "HTTP/1.1 200 Ok\r\n"; //needed for sending stuff
  * Methods
  */
 
-/*char* getRequestType(char request[], const char parseSym[]){
-
-	char *copyOfRequest, *token, *requestType;
-
-	copyOfRequest = (char *)malloc(strlen(request) + 1);
-    strcpy(copyOfRequest, request);
-    
-    //Tokenize the request copy
-    token = strtok(copyOfRequest, parseSym);
-        
-    requestType = token;
-    int i = 0;
-
-    do{
-    	if(i == 0){
-        	requestType = token;
-          	if(requestType == NULL){
-              	strcpy(requestType, "");
-          	}
-          	return requestType;
-      	}
-      	i++;
-   }while(token != NULL);
-   
-   //free everything allocated
-   free(token);
-   free(copyOfRequest);
-   return requestType;
-}
-
-char* getFileNeeded(char request[], const char parseSym[]){
-
-	char *copyOfRequest, *token, *fileNeeded;
-
-    copyOfRequest = (char *)malloc(strlen(request) + 1);
-    strcpy(copyOfRequest, request);
-    
-    //tokenize the request copy
-    token = strtok(copyOfRequest, parseSym);
-    
-    fileNeeded = token;
-    int i = 0;
-
-    do{
-      token = strtok(NULL, " ");
-      if(i == 0){
-          strcpy(fileNeeded, token);
-          if(fileNeeded == NULL){
-              strcpy(fileNeeded, "");
-          }
-          return fileNeeded;
-      }
-      i++;
-   }while(token != NULL); 
-   
-   //free everything
-   free(token);
-   free(copyOfRequest);
-   return fileNeeded;
-}
-
-
-char* getFileExtension(char request[], const char parseSym[])
-{
-	
-	char *copyOfRequest, *token, *fileExt;
-	int currentPlace = 0;
-
-    copyOfRequest = (char *)malloc(strlen(request) + 1);
-    strcpy(copyOfRequest, request);
-    
-    token = strtok(copyOfRequest, parseSym);
-    fileExt = token;
-
-    do{
-      token = strtok(NULL, " ");
-      if(currentPlace == 0){
-          fileExt = token;
-          if(fileExt == NULL){
-              fileExt = (char *)'\0';
-          }
-          return fileExt;
-      }
-      currentPlace++;
-   }while(token != NULL);
-   
-   //free everything...again
-   free(token);
-   free(copyOfRequest);
-   return fileExt;
-}**/
-
 vector<char *> getRequestInfo(char request[]){
 	vector<char *> requestInfo;
 	char *requestType, *filePath, *fileExt, *token;
 	char *string = strtok(request, "\n");
-	
-	//cout << "First line of the request: " << string << endl;
 	
 	// tokenize by " ", " ", and "."
 	
@@ -160,21 +66,16 @@ vector<char *> getRequestInfo(char request[]){
 	
 	//get filePath
 	token = strtok(NULL, " ");
-	//cout << "	the token is: " << token << endl;
 	filePath = token;
-	requestInfo.push_back(token);
+	requestInfo.push_back(filePath);
 	
 	
 	// get fileExt
 	token = strtok(filePath, ".");
-	//cout << "			token is: " << token << endl;
 	token = strtok(NULL, ".");
 	fileExt = token;
 	requestInfo.push_back(fileExt);
 	
-	/*cout << "Request type is: " << requestInfo[0] << endl;
-	cout << "File Path is: " << requestInfo[1] << endl;
-	cout << "FileExt is: " << requestInfo[2] << endl;*/
 	
 	return requestInfo;
 
@@ -182,7 +83,6 @@ vector<char *> getRequestInfo(char request[]){
 
 void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
 	cout << "http path: " << httpPath << endl;
-	//cout << "copy of header: " << copyOfHeader << endl;
 	
 	struct stat inputFile;  // hold information about input file 
 
@@ -195,7 +95,7 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
         send(socket , "404 Not Found!", strlen("404 Not Found!") , 0); //404 error stuff
     }
      
-    fstat(serverFDTransfer, &inputFile); // initialize inputFile
+    fstat(serverFDTransfer, &inputFile); // initialize inputFile with info from serverFDTransfer
     
     
     int totalSize = inputFile.st_size; //total size of the file
@@ -246,7 +146,7 @@ void sendJPEG(char *header, int socket, char *filePath, char* fileExtension){
 
 int main(int argc, char **argv){
 
-	int newSocket, serverFD, pid, hostName, valueRead;
+	int newSocket, serverFD, pid;
 	vector<char *> requestData;
 	char hostBuffer[1024];
 	char buffer[1024];
@@ -256,7 +156,7 @@ int main(int argc, char **argv){
 	int addressLength = sizeof(sockAddress);
 	
 	//get host things
-	hostName = gethostname(hostBuffer, sizeof(hostBuffer)); //get host name
+	gethostname(hostBuffer, sizeof(hostBuffer)); //get host name
 	hostEntry = gethostbyname(hostBuffer); //get host information. Needed to get IP address
 	IPBuffer = inet_ntoa(*((struct in_addr*)hostEntry->h_addr_list[0])); //convert network into string
 
@@ -286,7 +186,8 @@ int main(int argc, char **argv){
 	}
 
 	cout << "Port is: " << PORT << endl;
-	cout << "Hostname is: " << hostBuffer << endl;
+	cout << "Host Name is: " << hostBuffer << endl;
+	//cout << "Host Entry is: " << hostEntry << endl;
 	cout << "Host IP is: " << IPBuffer << endl;
 
 	while(1){ // Infinite loop for the server
@@ -301,8 +202,8 @@ int main(int argc, char **argv){
 		}
 		
 		//fork process
-		pid = fork();
-		if(pid < 0){
+		//pid = fork();
+		if((pid = fork()) < 0){
 			cout << "Error in fork" << endl;
 			exit(EXIT_FAILURE);
 		}
@@ -313,8 +214,6 @@ int main(int argc, char **argv){
 	    	cout << buffer << endl;
 	    	
 	    	requestData = getRequestInfo(buffer); // parse request into vector
-	    	
-	    	//parse all request data
             
             requestType = requestData[0];  //get request type
             cout << "Request Type: "<< requestType << endl;
@@ -331,29 +230,10 @@ int main(int argc, char **argv){
 	    	
 	    	if(strcmp(requestType, "GET") == 0){
 	    		if((strcmp(filePath, "/") == 0) || (strcmp(filePath, "") == 0)){
-	    			/*char httpPath[1024] = ".";
-	    			strcat(httpPath, "/index.html");
-                    strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
-                    sendClientMessage(newSocket, httpPath, copyOfHeader);*/
-                    
                     sendDefaultPage(copyOfHeader, newSocket);
 	    		}else if(strcmp(fileExtension, "html") == 0){
-	    			/*char httpPath[1024] = ".";
-	    			strcat(httpPath, filePath);
-	    			strcat(httpPath, ".");
-	    			strcat(httpPath, fileExtension);
-	    			strcat(copyOfHeader, "Content-Type: text/html\r\n\r\n");
-                    sendClientMessage(newSocket, httpPath, copyOfHeader);*/
-                    
-                    sendHTML(copyOfHeader, newSocket, filePath, fileExtension);
+	    			sendHTML(copyOfHeader, newSocket, filePath, fileExtension);
 	    		}else if((strcmp(fileExtension, "jpg") == 0) || (strcmp(fileExtension, "jpeg") == 0)){
-	    			/*char httpPath[1024] = ".";
-	    			strcat(httpPath, filePath);
-	    			strcat(httpPath, ".");
-	    			strcat(httpPath, fileExtension);
-	    			strcat(copyOfHeader, "Content-Type: image/jpeg\r\n\r\n");
-	    			sendClientMessage(newSocket, httpPath, copyOfHeader);*/
-	    			
 	    			sendJPEG(copyOfHeader, newSocket, filePath, fileExtension);
 	    		}
 	    	
@@ -363,17 +243,11 @@ int main(int argc, char **argv){
 	    	cout << "closing socket" << endl;	
 	    	close(newSocket);
 	    		
-	    		
-	    		
 	    	}else{
 	    		close(newSocket);
 	    	}
 
-	}	
-
-	cout << "Port is: " << PORT << endl;
-	cout << "Hostname is: " << hostBuffer << endl;
-	cout << "Host IP is: " << IPBuffer << endl;
+	}
 
 	close(serverFD);
 	return 0;
