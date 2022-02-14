@@ -102,6 +102,7 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
     if(serverFDTransfer < 0){
         perror("Cannot open file path!");
         send(socket , "404 Not Found!", strlen("404 Not Found!") , 0); //404 error stuff
+        close(socket);
     }
      
     fstat(serverFDTransfer, &inputFile); // initialize inputFile with info from serverFDTransfer
