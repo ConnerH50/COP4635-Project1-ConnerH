@@ -161,6 +161,7 @@ void sendJPEG(char *header, int socket, char *filePath, char* fileExtension){
 int main(int argc, char **argv){
 
 	int newSocket, serverFD, pid;
+	int option = 1;
 	vector<char *> requestData;
 	char hostBuffer[1024];
 	char buffer[1024];
@@ -186,6 +187,7 @@ int main(int argc, char **argv){
 		perror("Error cannot create socket");
 		return -1;
 	}
+	setsockopt(serverFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
 	//Bind the serverFD
 	if(bind(serverFD, (struct sockaddr *)&sockAddress, sizeof(sockAddress)) < 0){

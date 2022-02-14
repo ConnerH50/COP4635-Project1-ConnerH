@@ -5,4 +5,5 @@ How to run
 	2. Type "make" into the command-line
 	3. Run the program by typing "./httpServer"
 	4. Use the program by navigating to "http://localhost:60069/"
+		4a. If you get an "Address is already in use" error, waiting a few minutes will resolve it
 	5. You can then navigate through the links that are on the site.
