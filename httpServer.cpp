@@ -220,7 +220,6 @@ int main(int argc, char **argv){
 		}
 		
 		if(pid == 0){ 
-			//valueRead = read(newSocket , buffer, 1024); 
 			read(newSocket , buffer, 1024); //get request data
 	    	cout << buffer << endl;
 	    	
