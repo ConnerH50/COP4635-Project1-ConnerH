@@ -1,5 +1,6 @@
 /*
  * Conner Hendricks, COP4635 Project 1
+ * 2/13/2022
  */
 
 
@@ -50,6 +51,10 @@ char httpHeader[25] = "HTTP/1.1 200 Ok\r\n"; //needed for sending stuff
 /*
  * Methods
  */
+ 
+ /*
+ * Method to parse the client's request
+ */
 
 vector<char *> getRequestInfo(char request[]){
 	vector<char *> requestInfo;
@@ -80,6 +85,10 @@ vector<char *> getRequestInfo(char request[]){
 	return requestInfo;
 
 }
+
+/*
+ * Method to send client the message
+ */
 
 void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
 	cout << "http path: " << httpPath << endl;
@@ -112,6 +121,10 @@ void sendClientMessage(int socket, char httpPath[], char copyOfHeader[]){
         close(serverFDTransfer); //close byte transfer
     }
 }
+
+/*
+ * Methods to create and then send the various http headers and paths to the client
+ */
 
 void sendDefaultPage(char *header, int socket){
 	char httpPath[1024] = ".";
@@ -187,7 +200,6 @@ int main(int argc, char **argv){
 
 	cout << "Port is: " << PORT << endl;
 	cout << "Host Name is: " << hostBuffer << endl;
-	//cout << "Host Entry is: " << hostEntry << endl;
 	cout << "Host IP is: " << IPBuffer << endl;
 
 	while(1){ // Infinite loop for the server
@@ -202,7 +214,6 @@ int main(int argc, char **argv){
 		}
 		
 		//fork process
-		//pid = fork();
 		if((pid = fork()) < 0){
 			cout << "Error in fork" << endl;
 			exit(EXIT_FAILURE);
